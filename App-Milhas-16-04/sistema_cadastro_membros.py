@@ -1,4 +1,4 @@
-import csv
+import pandas as pd
 
 class SistemaCadastroMembros:
     def __init__(self, membros_file, advertencias_file):
@@ -9,36 +9,32 @@ class SistemaCadastroMembros:
 
     def _carregar_membros(self):
         membros = {}
-        with open(self.membros_file, 'r',encoding='utf-8') as f:
-            reader = csv.DictReader(f)
-            for row in reader:
-                membros[row['nome']] = Membro(row['nome'], row['setor'], row['cargo'], int(row['pontos']))
+        df = pd.read_csv(self.membros_file)
+        for index, row in df.iterrows():
+            membros[row['nome']] = Membro(row['nome'], row['setor'], row['cargo'], int(row['pontos']))
         return membros
 
     def _carregar_advertencias(self):
         advertencias = []
-        with open(self.advertencias_file, 'r',encoding='utf-8') as f:
-            reader = csv.DictReader(f)
-            for row in reader:
-                membro = self.membros[row['nome']]
-                adv = Advertencia(membro, int(row['pontos']), row['motivo'])
-                membro.adicionar_advertencia(adv)
-                advertencias.append(adv)
+        df = pd.read_csv(self.advertencias_file)
+        for index, row in df.iterrows():
+            membro = self.membros[row['nome']]
+            adv = Advertencia(membro, int(row['pontos']), row['motivo'])
+            membro.adicionar_advertencia(adv)
+            advertencias.append(adv)
         return advertencias
-
+    
     def _salvar_membros(self):
-        with open(self.membros_file, 'w', newline='') as f:
-            writer = csv.writer(f)
-            writer.writerow(['nome', 'setor', 'cargo', 'pontos'])
-            for membro in self.membros.values():
-                writer.writerow([membro.nome, membro.setor, membro.cargo, membro.pontos])
+        df = pd.DataFrame(columns=['nome', 'setor', 'cargo', 'pontos'])
+        for membro in self.membros.values():
+            df = df.append({'nome': membro.nome, 'setor': membro.setor, 'cargo': membro.cargo, 'pontos': membro.pontos}, ignore_index=True)
+        df.to_csv(self.membros_file, index=False)
 
     def _salvar_advertencias(self):
-        with open(self.advertencias_file, 'w', newline='') as f:
-            writer = csv.writer(f)
-            writer.writerow(['nome', 'pontos', 'motivo'])
-            for adv in self.advertencias:
-                writer.writerow([adv.membro.nome, adv.pontos, adv.motivo])
+        df = pd.DataFrame(columns=['nome', 'pontos', 'motivo'])
+        for adv in self.advertencias:
+            df = df.append({'nome': adv.membro.nome, 'pontos': adv.pontos, 'motivo': adv.motivo}, ignore_index=True)
+        df.to_csv(self.advertencias_file, index=False)
 
     def cadastrar_membro(self, nome, setor, cargo, pontos):
         if nome in self.membros:
