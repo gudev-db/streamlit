@@ -9,7 +9,7 @@ class SistemaCadastroMembros:
 
     def _carregar_membros(self):
         membros = {}
-        with open(self.membros_file, 'r') as f:
+        with open(self.membros_file, 'r',encoding='utf-8') as f:
             reader = csv.DictReader(f)
             for row in reader:
                 membros[row['nome']] = Membro(row['nome'], row['setor'], row['cargo'], int(row['pontos']))
@@ -17,7 +17,7 @@ class SistemaCadastroMembros:
 
     def _carregar_advertencias(self):
         advertencias = []
-        with open(self.advertencias_file, 'r') as f:
+        with open(self.advertencias_file, 'r',encoding='utf-8') as f:
             reader = csv.DictReader(f)
             for row in reader:
                 membro = self.membros[row['nome']]
