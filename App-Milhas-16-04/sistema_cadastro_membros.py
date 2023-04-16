@@ -9,32 +9,34 @@ class SistemaCadastroMembros:
 
     def _carregar_membros(self):
         membros = {}
-        df = pd.read_csv(self.membros_file)
+        df = pd.read_csv(self.membros_file, encoding='utf-8')
         for index, row in df.iterrows():
             membros[row['nome']] = Membro(row['nome'], row['setor'], row['cargo'], int(row['pontos']))
         return membros
 
     def _carregar_advertencias(self):
         advertencias = []
-        df = pd.read_csv(self.advertencias_file)
+        df = pd.read_csv(self.advertencias_file, encoding='utf-8')
         for index, row in df.iterrows():
             membro = self.membros[row['nome']]
             adv = Advertencia(membro, int(row['pontos']), row['motivo'])
             membro.adicionar_advertencia(adv)
             advertencias.append(adv)
         return advertencias
+
     
     def _salvar_membros(self):
         df = pd.DataFrame(columns=['nome', 'setor', 'cargo', 'pontos'])
         for membro in self.membros.values():
             df = df.append({'nome': membro.nome, 'setor': membro.setor, 'cargo': membro.cargo, 'pontos': membro.pontos}, ignore_index=True)
-        df.to_csv(self.membros_file, index=False)
+        df.to_csv(self.membros_file, index=False, encoding='utf-8')
 
     def _salvar_advertencias(self):
         df = pd.DataFrame(columns=['nome', 'pontos', 'motivo'])
         for adv in self.advertencias:
             df = df.append({'nome': adv.membro.nome, 'pontos': adv.pontos, 'motivo': adv.motivo}, ignore_index=True)
-        df.to_csv(self.advertencias_file, index=False)
+        df.to_csv(self.advertencias_file, index=False, encoding='utf-8')
+
 
     def cadastrar_membro(self, nome, setor, cargo, pontos):
         if nome in self.membros:
