@@ -87,4 +87,3 @@ class Advertencia:
 
     def __str__(self):
         return f'Advertência - Membro: {self.membro.nome} - Pontos: {self.pontos} - Motivo: {self.motivo}'
-
